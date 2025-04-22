@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grid Background Generator</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      color: #7b39ff;
+    }
+    .download-btn {
+      display: inline-block;
+      background: #7b39ff;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Retro Grid Background Generator</h1>
+  <p>This tool generates a retro-style grid background for the Financial Crystal app.</p>
+  <div id="output"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      createGridBackground();
+    });
+
+    function createGridBackground() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1200;
+      canvas.height = 1000;
+      const ctx = canvas.getContext('2d');
+
+      // Draw grid
+      ctx.fillStyle = "#0c0c1e";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw horizon
+      const gradient = ctx.createLinearGradient(0, canvas.height * 0.5, 0, canvas.height);
+      gradient.addColorStop(0, "rgba(255, 0, 255, 0.2)");
+      gradient.addColorStop(1, "rgba(0, 255, 255, 0.05)");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, canvas.height * 0.5, canvas.width, canvas.height * 0.5);
+
+      // Draw grid lines
+      ctx.strokeStyle = 'rgba(123, 57, 255, 0.3)';
+      ctx.lineWidth = 1;
+
+      // Horizontal lines with perspective
+      for (let y = 0; y <= 20; y++) {
+        const yPos = canvas.height * 0.5 + y * y * 2;
+        if (yPos >= canvas.height) continue;
+
+        ctx.beginPath();
+        ctx.moveTo(0, yPos);
+        ctx.lineTo(canvas.width, yPos);
+        ctx.globalAlpha = 1 - (y / 20) * 0.8;
+        ctx.stroke();
+      }
+
+      // Vertical lines with perspective
+      const horizon = canvas.height * 0.5;
+      const vanishingPointX = canvas.width * 0.5;
+
+      for (let x = 0; x <= 40; x++) {
+        const xPos = vanishingPointX + (x - 20) * 40;
+
+        ctx.beginPath();
+        ctx.moveTo(xPos, horizon);
+        ctx.lineTo(xPos > vanishingPointX ? canvas.width : 0, canvas.height);
+        ctx.globalAlpha = 1 - Math.abs(x - 20) / 20 * 0.8;
+        ctx.stroke();
+      }
+
+      // Export as PNG data URL
+      const dataUrl = canvas.toDataURL('image/png');
+
+      // Create download link
+      const output = document.getElementById('output');
+
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = 'grid-bg.png';
+      link.className = 'download-btn';
+      link.textContent = 'Download Grid Background';
+      output.appendChild(link);
+
+      // Add some space
+      output.appendChild(document.createElement('br'));
+      output.appendChild(document.createElement('br'));
+
+      // Create preview
+      const img = new Image();
+      img.src = dataUrl;
+      img.style.width = '100%';
+      img.style.maxWidth = '800px';
+      img.style.border = '1px solid #ccc';
+      output.appendChild(img);
+    }
+  </script>
+</body>
+</html>
